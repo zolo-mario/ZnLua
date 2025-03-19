@@ -53,8 +53,8 @@ static int UE_Index(lua_State* L)
         }
         else
         {
-            UE_LOG(LogUnLua, Warning, TEXT("attempt to load a blueprint type %s with UE namespace, use UE.UClass.Load or UE.UObject.Load instead."), UTF8_TO_TCHAR(Name));
-            return 0;
+            UnLua::PushUObject(L, ReflectedType, false);
+            return 1;
         }
     }
     else if (Prefix == 'E')
@@ -70,8 +70,8 @@ static int UE_Index(lua_State* L)
         }
         else
         {
-            UE_LOG(LogUnLua, Warning, TEXT("attempt to load a blueprint enum %s with UE namespace, use UE.UObject.Load instead."), UTF8_TO_TCHAR(Name));
-            return 0;
+            UnLua::PushUObject(L, ReflectedType, false);
+            return 1;
         }
     }
 

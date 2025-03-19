@@ -795,7 +795,7 @@ public:
             {
                 if (!bCopyValue && Property->HasAnyPropertyFlags(CPF_OutParm))
                 {
-                    if (Src->ElementSize < ArrayProperty->Inner->ElementSize)
+                    if (Src->ElementSize < ArrayProperty->Inner->GetElementSize())
                     {
                         FScriptArrayHelper Helper(ArrayProperty, ValuePtr);
                         if (Src->Num() > 0)
@@ -1166,11 +1166,24 @@ class FStructPropertyDesc : public FPropertyDesc
 {
 public:
 	explicit FStructPropertyDesc(FProperty* InProperty)
-		: FPropertyDesc(InProperty), bFirstPropOfScriptStruct(GetPropertyOuter(Property)->IsA<UScriptStruct>() && Property->GetOffset_ForInternal() == 0)
+		: FPropertyDesc(InProperty), bFirstPropOfScriptStruct(GetPropertyOuter(Property)->IsA<UScriptStruct>() && Property->GetOffset_ForInternal() == 0), Struct(((FStructProperty*)Property)->Struct)
 	{}
+
+    virtual bool IsValid() const
+    {
+        if (!Struct.IsValid())
+        {
+            return false;
+        }
+
+        return FPropertyDesc::IsValid();
+    }
 
 protected:
 	bool bFirstPropOfScriptStruct;
+
+private:
+    TWeakObjectPtr<UStruct> Struct;
 };
 
 

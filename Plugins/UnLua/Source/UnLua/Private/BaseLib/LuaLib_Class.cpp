@@ -123,12 +123,53 @@ static int32 UClass_GetDefaultObject(lua_State* L)
     return 1;
 }
 
+/**
+ * Add class registry
+ */
+int32 UClass_AddClassRegistry(lua_State* L)
+{
+    int32 NumParams = lua_gettop(L);
+    if (NumParams != 1)
+        return luaL_error(L, "invalid parameters");
+
+    const char* ClassPath = lua_tostring(L, 1);
+    if (!ClassPath)
+        return luaL_error(L, "invalid class path");
+
+    FString FullPath = UTF8_TO_TCHAR(ClassPath);
+
+    int32 LastSlashIndex;
+    if (FullPath.FindLastChar('/', LastSlashIndex))
+    {
+        FString FileNameAndClass = FullPath.RightChop(LastSlashIndex + 1);
+
+        int32 DotIndex;
+        if (FileNameAndClass.FindChar('.', DotIndex))
+        {
+            FString ClassName =*FileNameAndClass.RightChop(DotIndex + 1);
+
+            UnLua::FLuaEnv& Env = UnLua::FLuaEnv::FindEnvChecked(L);
+            Env.GetClassRegistry()->AddClassRegistry(*ClassName, UTF8_TO_TCHAR(ClassPath));
+
+            return 0;
+        }
+        else
+        {
+            return luaL_error(L, "invalid class path");
+        }
+    }
+    else
+    {
+        return luaL_error(L, "invalid class path");
+    }
+}
 
 static const luaL_Reg UClassLib[] =
 {
     {"Load", UClass_Load},
     {"IsChildOf", UClass_IsChildOf},
     {"GetDefaultObject", UClass_GetDefaultObject},
+    {"AddClassRegistry", UClass_AddClassRegistry},
     {nullptr, nullptr}
 };
 

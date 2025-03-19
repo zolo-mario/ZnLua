@@ -138,7 +138,7 @@ public:
     virtual void Destruct(void* Dest) const override
     {
         if (PropertyPtr.IsValid())
-            Property->DestroyValue(Dest);
+            PropertyPtr->DestroyValue(Dest);
     }
 
     virtual void Copy(void *Dest, const void *Src) const override { Property->CopySingleValue(Dest, Src); }

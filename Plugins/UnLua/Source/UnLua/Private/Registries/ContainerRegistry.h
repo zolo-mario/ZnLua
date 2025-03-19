@@ -1,4 +1,4 @@
-﻿// Tencent is pleased to support the open source community by making UnLua available.
+// Tencent is pleased to support the open source community by making UnLua available.
 // 
 // Copyright (C) 2019 THL A29 Limited, a Tencent company. All rights reserved.
 //
@@ -24,7 +24,7 @@ namespace UnLua
 {
     class FLuaEnv;
 
-    class FContainerRegistry
+    class UNLUA_API FContainerRegistry
     {
     public:
         explicit FContainerRegistry(FLuaEnv* Env);

@@ -272,6 +272,11 @@ namespace UnLua
         Unregister(Desc, true);
     }
 
+    void FClassRegistry::AddClassRegistry(FName Name, FString ClassPath)
+    {
+        BlueprintClasses.Add(Name, ClassPath);
+    }
+
     void FClassRegistry::NotifyUObjectDeleted(UObject* Object)
     {
         Unregister((UStruct*)Object);
@@ -282,21 +287,31 @@ namespace UnLua
         FString Name = UTF8_TO_TCHAR(InName);
 
         // find candidates in memory
-        UField* Ret = FindFirstObject<UClass>(*Name);
-        if (!Ret)
-            Ret = FindFirstObject<UScriptStruct>(*Name);
-        if (!Ret)
-            Ret = FindFirstObject<UEnum>(*Name);
+        if (UField* Result = FindFirstObject<UClass>(*Name))
+            return Result;
+        if (UField* Result = FindFirstObject<UScriptStruct>(*Name))
+            return Result;
+        if (UField* Result = FindFirstObject<UEnum>(*Name))
+            return Result;
 
         // load candidates if not found
-        if (!Ret)
-            Ret = LoadObject<UClass>(nullptr, *Name);
-        if (!Ret)
-            Ret = LoadObject<UScriptStruct>(nullptr, *Name);
-        if (!Ret)
-            Ret = LoadObject<UEnum>(nullptr, *Name);
+        for (const TPair<lua_State*, FLuaEnv*>& Pair : FLuaEnv::GetAll())
+        {
+            if (FString* ClassPath = Pair.Value->GetClassRegistry()->BlueprintClasses.Find(*Name))
+            {
+                if (UField* Result = LoadObject<UField>(nullptr, **ClassPath))
+                {
+                    if (Result->IsA<UClass>())
+                        return Result;
+                    if (Result->IsA<UScriptStruct>())
+                        return Result;
+                    if (Result->IsA<UEnum>())
+                        return Result;
+                }
+            }
+        }
 
-        return Ret;
+        return nullptr;
     }
 
     FClassDesc* FClassRegistry::RegisterInternal(UStruct* Type, const FString& Name)

@@ -52,6 +52,8 @@ namespace UnLua
 
         void Unregister(const UStruct* Class);
 
+        void AddClassRegistry(FName Name, FString ClassPath);
+
     private:
         FClassDesc* RegisterInternal(UStruct* Type, const FString& Name);
 
@@ -59,6 +61,7 @@ namespace UnLua
 
         TMap<UStruct*, FClassDesc*> Classes;
         TMap<FName, FClassDesc*> Name2Classes;
+        TMap<FName, FString> BlueprintClasses;
 
         FLuaEnv* Env;
     };

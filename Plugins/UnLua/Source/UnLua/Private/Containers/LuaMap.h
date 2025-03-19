@@ -17,7 +17,7 @@
 #include "LuaArray.h"
 #include "Runtime/Launch/Resources/Version.h"
 
-class FLuaMap
+class UNLUA_API FLuaMap
 {
 public:
     struct FLuaMapEnumerator
@@ -377,8 +377,8 @@ private:
             return;
         }
 
-        bool bDestroyKeys = !KeyInterface->IsPODType() && !KeyInterface->IsTriviallyDestructible();
-        bool bDestroyValues = !ValueInterface->IsPODType() && !ValueInterface->IsTriviallyDestructible();
+        bool bDestroyKeys = !KeyInterface->IsPODType() && !KeyInterface->IsTriviallyDestructible() && KeyInterface->IsValid();
+        bool bDestroyValues = !ValueInterface->IsPODType() && !ValueInterface->IsTriviallyDestructible() && ValueInterface->IsValid();
         if (bDestroyKeys || bDestroyValues)
         {
             uint32 Stride = MapLayout.SetLayout.Size;
