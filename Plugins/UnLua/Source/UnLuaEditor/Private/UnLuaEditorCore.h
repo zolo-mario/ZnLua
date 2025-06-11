@@ -31,5 +31,8 @@ enum ELuaBindingStatus
     BoundButInvalid
 };
 
+/* 获取指定蓝图对象上的Lua脚本路径 */
+FString GetLuaScriptFileName(const UBlueprint* Blueprint);
+
 /* 获取指定蓝图对象上的Lua绑定状态 */
 ELuaBindingStatus GetBindingStatus(const UBlueprint* Blueprint);

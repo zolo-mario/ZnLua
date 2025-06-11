@@ -18,6 +18,66 @@
 #include "UnLuaSettings.h"
 #include "Engine/Blueprint.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/IPluginManager.h"
+
+
+FString GetLuaScriptFileName(const UBlueprint* Blueprint)
+{
+    if (!Blueprint)
+    {
+        return TEXT("");
+    }
+
+    const UClass* Class = Blueprint->GeneratedClass;
+    const FString ClassName = Class->GetName();
+    FString OuterPath = Class->GetPathName();
+
+    // 获取包路径信息
+    FString PackageRoot, PackagePath, PackageName;
+    FPackageName::SplitLongPackageName(OuterPath, PackageRoot, PackagePath, PackageName);
+
+    // 确定基础内容目录
+    FString ContentDir;
+    if (PackageRoot.StartsWith(TEXT("/Game")))
+    {
+        // 项目Content
+        ContentDir = FPaths::ProjectContentDir();
+    }
+    else if (PackageRoot.StartsWith(TEXT("/")))
+    {
+        // 插件或模块Content
+        FString PluginModuleName = PackageRoot.Mid(1); // 移除开头的'/'
+        int32 SlashIndex;
+        if (PluginModuleName.FindChar(TEXT('/'), SlashIndex))
+        {
+            PluginModuleName = PluginModuleName.Left(SlashIndex);
+        }
+
+        TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(PluginModuleName);
+        if (Plugin.IsValid())
+        {
+            ContentDir = Plugin->GetContentDir();
+        }
+        else
+        {
+            // 尝试查找模块
+            FString ModulePath = FPaths::Combine(FPaths::ProjectPluginsDir(), PluginModuleName);
+            if (!FPaths::DirectoryExists(ModulePath))
+            {
+                ModulePath = FPaths::Combine(FPaths::EnginePluginsDir(), PluginModuleName);
+            }
+            ContentDir = FPaths::Combine(ModulePath, TEXT("Content"));
+        }
+    }
+
+    // 构建Script目录路径
+    FString RelativePath = PackagePath; // 例如 "A/B/C"
+    FString ScriptDir = FPaths::Combine(ContentDir, TEXT("Script"), RelativePath);
+
+    const FString FileName = FPaths::ConvertRelativePathToFull(FPaths::Combine(ScriptDir, FString::Printf(TEXT("%s.lua"), *ClassName)));
+
+    return FileName;
+}
 
 ELuaBindingStatus GetBindingStatus(const UBlueprint* Blueprint)
 {
@@ -43,10 +103,10 @@ ELuaBindingStatus GetBindingStatus(const UBlueprint* Blueprint)
     const auto ModuleName = ModuleLocator->Locate(Target);
     if (ModuleName.IsEmpty())
         return ELuaBindingStatus::Unknown;
+    
+    const FString FileName = GetLuaScriptFileName(Blueprint);
 
-    const auto RelativePath = ModuleName.Replace(TEXT("."), TEXT("/")) + TEXT(".lua");
-    const auto FullPath = GLuaSrcFullPath + "/" + RelativePath;
-    if (!FPaths::FileExists(FullPath))
+    if (!FPaths::FileExists(FileName))
         return ELuaBindingStatus::BoundButInvalid;
 
     return ELuaBindingStatus::Bound;

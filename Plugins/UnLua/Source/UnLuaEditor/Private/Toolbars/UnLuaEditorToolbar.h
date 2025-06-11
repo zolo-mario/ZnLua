@@ -44,6 +44,8 @@ public:
 
     void RevealInExplorer_Executed();
 
+    void RevealInIDE_Executed();
+
 protected:
     virtual void BindCommands();
 

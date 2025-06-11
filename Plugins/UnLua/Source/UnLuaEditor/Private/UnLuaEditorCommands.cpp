@@ -31,6 +31,7 @@ void FUnLuaEditorCommands::RegisterCommands()
     UI_COMMAND(About, "About", "About this version", EUserInterfaceActionType::Button, FInputChord());
     UI_COMMAND(GenerateIntelliSense, "Generate IntelliSense", "Generate intelliSense files", EUserInterfaceActionType::Button, FInputChord());
     UI_COMMAND(RevealInExplorer, "Reveal in Explorer", "Reveal lua file in explorer", EUserInterfaceActionType::Button, FInputChord());
+    UI_COMMAND(RevealInIDE, "Reveal in IDE", "Reveal lua file in IDE", EUserInterfaceActionType::Button, FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE
