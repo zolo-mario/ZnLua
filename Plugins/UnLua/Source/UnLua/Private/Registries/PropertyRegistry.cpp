@@ -129,6 +129,43 @@ namespace UnLua
         return BoolProperty;
     }
 
+    TSharedPtr<ITypeInterface> FPropertyRegistry::GetByteProperty()
+    {
+        if (!ByteProperty)
+        {
+#if UE_VERSION_OLDER_THAN(5, 1, 0)
+            const auto Property = new FByteProperty(PropertyCollector, NAME_None, RF_Transient, 0, (EPropertyFlags)0, 0xFF, 1, true);
+#else
+            constexpr auto Params = UECodeGen_Private::FBytePropertyParams
+            {
+                nullptr,
+                nullptr,
+                CPF_None,
+                UECodeGen_Private::EPropertyGenFlags::Byte,
+                RF_Transient,
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
+                1,
+#endif
+                nullptr,
+                nullptr,
+#if UE_VERSION_NEWER_THAN(5, 2, 1)
+                1,
+#endif
+                sizeof(FPropertyCollector),
+                nullptr,
+#if UE_VERSION_NEWER_THAN(5, 2, 1)
+                METADATA_PARAMS(0, nullptr)
+#else
+                METADATA_PARAMS(nullptr, 0)
+#endif
+            };
+            const auto Property = new FByteProperty(PropertyCollector, Params);
+#endif
+            ByteProperty = TSharedPtr<ITypeInterface>(FPropertyDesc::Create(Property));
+        }
+        return ByteProperty;
+    }
+
     TSharedPtr<ITypeInterface> FPropertyRegistry::GetIntProperty()
     {
         if (!IntProperty)

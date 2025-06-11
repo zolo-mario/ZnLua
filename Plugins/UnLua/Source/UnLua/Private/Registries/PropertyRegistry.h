@@ -40,6 +40,7 @@ namespace UnLua
         TSharedPtr<ITypeInterface> CreateTypeInterface(lua_State* L, int32 Index);
 
         TSharedPtr<ITypeInterface> GetBoolProperty();
+        TSharedPtr<ITypeInterface> GetByteProperty();
         TSharedPtr<ITypeInterface> GetIntProperty();
         TSharedPtr<ITypeInterface> GetFloatProperty();
         TSharedPtr<ITypeInterface> GetStringProperty();
@@ -52,6 +53,7 @@ namespace UnLua
         UScriptStruct* PropertyCollector;
         TMap<UField*, TSharedPtr<ITypeInterface>> FieldProperties;
         TSharedPtr<ITypeInterface> BoolProperty;
+        TSharedPtr<ITypeInterface> ByteProperty;
         TSharedPtr<ITypeInterface> IntProperty;
         TSharedPtr<ITypeInterface> FloatProperty;
         TSharedPtr<ITypeInterface> StringProperty;
