@@ -17,6 +17,9 @@
 #include "CoreUObject.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "Misc/EngineVersionComparison.h"
+#if WITH_METADATA && ENGINE_MAJOR_VERSION > 5 && ENGINE_MINOR_VERSION > 5
+#include "UObject/MetaData.h"
+#endif
 
 #if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 19
 #define DEFINE_FUNCTION(func) void func( FFrame& Stack, RESULT_DECL )
@@ -75,6 +78,10 @@ typedef UMulticastSparseDelegateProperty FMulticastSparseDelegateProperty;
 #else
 #define GetPropertyOuter(Property) (Property)->GetOwnerUObject()
 #define GetChildProperties(Function) (Function)->ChildProperties
+#endif
+
+#if WITH_METADATA && ENGINE_MAJOR_VERSION > 4 && ENGINE_MINOR_VERSION > 5
+typedef FMetaData UMetaData;
 #endif
 
 #if ENGINE_MAJOR_VERSION < 5
