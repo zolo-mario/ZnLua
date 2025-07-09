@@ -35,8 +35,11 @@ public class Lua : ModuleRules
     #if UE_5_6_OR_LATER
         CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
         CppCompileWarningSettings.ShadowVariableWarningLevel = WarningLevel.Off;
-    #else
+    #elif UE_5_0_OR_LATER
         UndefinedIdentifierWarningLevel = WarningLevel.Off;
+        ShadowVariableWarningLevel = WarningLevel.Off;
+	#else
+		bEnableUndefinedIdentifierWarnings = false;
         ShadowVariableWarningLevel = WarningLevel.Off;
     #endif
 

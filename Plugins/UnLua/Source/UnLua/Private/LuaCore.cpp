@@ -711,7 +711,11 @@ template <typename T, bool WithMetaTableName>
 static void PushPropertyArray(lua_State *L, T *Property, void *Value, void(*PushFunc)(lua_State*, T*, void*), const char *MetatableName = nullptr)
 {
 #if !UE_BUILD_SHIPPING
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
+    if (!Property || !Value || Property->ArrayDim < 2 || Property->ElementSize < 1)
+#else
     if (!Property || !Value || Property->ArrayDim < 2 || Property->GetElementSize() < 1)
+#endif
     {
         UNLUA_LOGERROR(L, LogUnLua, Warning, TEXT("%s, Invalid parameters!"), ANSI_TO_TCHAR(__FUNCTION__));
         return;
@@ -739,7 +743,11 @@ static void PushPropertyArray(lua_State *L, T *Property, void *Value, void(*Push
         {
             lua_pushinteger(L, i + 1);
             PushFunc(L, Property, ElementPtr);
+        #if UE_VERSION_OLDER_THAN(5, 3, 0)
+            ElementPtr += Property->ElementSize;
+        #else
             ElementPtr += Property->GetElementSize();
+        #endif
             TPropertyArrayPushPolicy<T, WithMetaTableName>::PostPushSingleElement(L);
         }
         TPropertyArrayPushPolicy<T, WithMetaTableName>::PostPushArray(L);

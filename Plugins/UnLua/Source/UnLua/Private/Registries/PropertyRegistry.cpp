@@ -134,7 +134,7 @@ namespace UnLua
         if (!ByteProperty)
         {
 #if UE_VERSION_OLDER_THAN(5, 1, 0)
-            const auto Property = new FByteProperty(PropertyCollector, NAME_None, RF_Transient, 0, (EPropertyFlags)0, 0xFF, 1, true);
+            const auto Property = new FByteProperty(PropertyCollector, NAME_None, RF_Transient, 0, (EPropertyFlags)0, nullptr);
 #else
             constexpr auto Params = UECodeGen_Private::FBytePropertyParams
             {
@@ -457,7 +457,11 @@ namespace UnLua
             const auto UnderlyingProperty = new FByteProperty(EnumProperty, TEXT("UnderlyingType"), RF_Transient);
             Property = EnumProperty;
             Property->AddCppProperty(UnderlyingProperty);
+        #if UE_VERSION_OLDER_THAN(5, 3, 0)
+            Property->ElementSize = UnderlyingProperty->ElementSize;
+        #else
             Property->SetElementSize(UnderlyingProperty->GetElementSize());
+        #endif
             Property->PropertyFlags |= CPF_IsPlainOldData | CPF_NoDestructor | CPF_ZeroConstructor;
         }
         else

@@ -47,7 +47,11 @@ namespace UnLua
 
             if (StructType != nullptr)
             {
+            #if UE_VERSION_OLDER_THAN(5, 0, 0)
+                FString Name = StructType->IsNative() ? FString("F" + StructType->GetName()) : StructType->GetPathName();
+            #else
                 FString Name = StructType->IsNative() ? FString("F" + StructType->GetName()) : StructType->GetStructPathName().ToString();
+            #endif
                 uint8 StructPadding = StructType->GetMinAlignment();
                 uint8 Padding = StructPadding < 8 ? 8 : StructPadding;
                 void* Userdata = NewUserdataWithPadding(L, StructType->GetStructureSize(), TCHAR_TO_UTF8(*Name), Padding);
